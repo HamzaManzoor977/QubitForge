@@ -122,7 +122,7 @@ with st.sidebar:
 
     st.divider()
 
-        # ... inside sidebar ...
+          # ... inside sidebar ...
     history = load_history()
 
     if not history:
@@ -137,16 +137,13 @@ with st.sidebar:
             else:
                 icon, color = "📘", "#2ecc71"
 
-            # FIX: Use 'created_at' instead of 'timestamp'
-            # And format the ISO date string nicely
-            try:
-                dt = datetime.fromisoformat(item["created_at"].replace("Z", "+00:00"))
-                nice_time = dt.strftime("%b %d, %I:%M %p")
-            except:
-                nice_time = "Unknown Time"
+            # FIX: Handle timestamp vs created_at and create a truly unique key
+            time_data = item.get("timestamp") or item.get("created_at", "")
             
-            # Use the formatted time for the key to ensure uniqueness
-            key = f"history_{nice_time}_{item['topic']}"
+            # Add a random number to ensure uniqueness even if times are identical
+            unique_id = str(uuid.uuid4())[:8]
+            
+            key = f"hist_{time_data}_{unique_id}"
 
             c1, c2 = st.columns([5, 1])
 
@@ -168,7 +165,17 @@ with st.sidebar:
                     unsafe_allow_html=True
                 )
 
-            # Display the nice time
+            # Display nice time
+            try:
+                # Parse ISO format if it's 'created_at'
+                if "T" in time_data:
+                    dt = datetime.fromisoformat(time_data.replace("Z", "+00:00"))
+                    nice_time = dt.strftime("%b %d, %I:%M %p")
+                else:
+                    nice_time = time_data
+            except:
+                nice_time = "Unknown Time"
+
             st.caption(f"🕒 {nice_time}")
             st.divider()
 
