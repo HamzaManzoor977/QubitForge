@@ -10,9 +10,7 @@ load_dotenv()
 # Debug once (remove later)
 print("GROQ KEY LOADED:", os.getenv("GROQ_API_KEY"))
 
-client = Groq(
-    api_key=os.getenv("GROQ_API_KEY")
-)
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def generate(prompt: str) -> str:
     response = client.chat.completions.create(
